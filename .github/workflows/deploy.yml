@@ -30,7 +30,7 @@ jobs:
       - name: requirements
         run: |
           npm install
-          pip install -e requirements.txt
+          pip install -r requirements.txt
       - name: git identity
         run: |
           git config user.email "adam.kariv@gmail.com"
