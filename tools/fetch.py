@@ -29,7 +29,15 @@ def main():
     diagram = ''
     diagram += ('---\ntitle: טקסונומיה משרד הרווחה\n---\nerDiagram\n')
     for c in concepts:
-        diagram += (f'\te{c["idx"]}["{c["Name"]}"]\n')
+        diagram += (f'\te{c["idx"]}["{c["Name"]}"]')
+        if c['Vocabulary']:
+            diagram += ' {\n'
+            for v in c['Vocabulary']:
+                v = v.replace('"', '״')
+                diagram += (f'\t  _ _ "{v}"\n')
+            diagram += '\t}\n'
+        else:
+            diagram += '\n'
     for c in concepts:
         if c['Broader Term of...']:
             for b in c['Broader Term of...']:
