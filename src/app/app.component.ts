@@ -20,7 +20,7 @@ export class AppComponent {
   @ViewChild('map') mapEl: ElementRef;
   overlay: L.SVGOverlay;
   map: L.Map;
-  svgElementBounds: L.LatLngBoundsExpression;
+  svgElementBounds: L.LatLngBoundsLiteral;
 
   constructor(private domSanitizer: DomSanitizer) {}
 
@@ -57,7 +57,12 @@ export class AppComponent {
       }),
       delay(1),
       tap(() => {
-        this.map.fitBounds(this.svgElementBounds);
+        const width = this.svgElementBounds[1][0] - this.svgElementBounds[0][0];
+        const height = this.svgElementBounds[1][1] - this.svgElementBounds[0][1];
+        const radius = Math.min(width, height) / 2;
+        const center = [ this.svgElementBounds[0][0] + width / 2, this.svgElementBounds[0][1] + height / 2 ];
+        const bounds: L.LatLngBoundsLiteral = [ [ center[0] - radius, center[1] - radius ], [ center[0] + radius, center[1] + radius ] ];
+        this.map.fitBounds(bounds);
         this.chartSvg = null;
       })
     ).subscribe();
