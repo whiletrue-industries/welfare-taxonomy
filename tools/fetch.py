@@ -44,7 +44,7 @@ def main():
                 diagram += (f'\te{c["idx"]} ||--|| e{b["idx"]} : "הרחבה של..."\n')
         if c['Facet of...']:
             for f in c['Facet of...']:
-                diagram += (f'\te{c["idx"]} ||--|| e{f["idx"]} : "מאפיין של..."\n')
+                diagram += (f'\te{f["idx"]} ||--|| e{c["idx"]} : "מאפיין של..."\n')
 
     diagram = f'export const diagram = `{diagram}`;'
     (Path(__file__).parent.parent / 'src' / 'app' / 'diagram.ts').write_text(diagram)
