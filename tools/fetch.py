@@ -22,7 +22,7 @@ def main():
     ).results()[0][0]
     concept_map = {x[DFA.AIRTABLE_ID_FIELD]: x for x in concepts}
     for i, c in enumerate(concepts):
-        c['Broader Term of...'] = [concept_map.get(x) for x in c['Broader Term of...']] if c['Broader Term of...'] else None
+        c['Narrower Term of...'] = [concept_map.get(x) for x in c['Narrower Term of...']] if c['Narrower Term of...'] else None
         c['Facet of...'] = [concept_map.get(x) for x in c['Facet of...']] if c['Facet of...'] else None
         c['idx'] = i
     
@@ -33,15 +33,15 @@ def main():
         if c['Vocabulary']:
             diagram += ' {\n'
             for v in c['Vocabulary']:
-                v = v.replace('"', '״')
+                v = v.replace('"', '״').replace('\n', ' ')
                 diagram += (f'\t  _ _ "{v}"\n')
             diagram += '\t}\n'
         else:
             diagram += '\n'
     for c in concepts:
-        if c['Broader Term of...']:
-            for b in c['Broader Term of...']:
-                diagram += (f'\te{c["idx"]} ||--|| e{b["idx"]} : "הרחבה של..."\n')
+        if c['Narrower Term of...']:
+            for n in c['Narrower Term of...']:
+                diagram += (f'\te{n["idx"]} ||--|| e{c["idx"]} : "הרחבה של..."\n')
         if c['Facet of...']:
             for f in c['Facet of...']:
                 diagram += (f'\te{f["idx"]} ||--|| e{c["idx"]} : "מאפיין של..."\n')
