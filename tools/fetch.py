@@ -9,7 +9,7 @@ CONCEPTS_TABLE = 'Concepts'
 TERMS_TABLE = 'Entry Terms'
 VIEW = 'Grid view'
 
-def main():
+def process(outfile, with_vocabulary=True):
     terms = DF.Flow(
         DFA.load_from_airtable(BASE, TERMS_TABLE, VIEW, apikey=APIKEY),
     ).results()[0][0]
@@ -30,7 +30,7 @@ def main():
     diagram += ('---\ntitle: טקסונומיה משרד הרווחה\n---\nerDiagram\n')
     for c in concepts:
         diagram += (f'\te{c["idx"]}["{c["Name"]}"]')
-        if c['Vocabulary']:
+        if c['Vocabulary'] and with_vocabulary:
             diagram += ' {\n'
             for v in c['Vocabulary']:
                 v = v.replace('"', '״').replace('\n', ' ')
@@ -47,7 +47,9 @@ def main():
                 diagram += (f'\te{f["idx"]} ||--|| e{c["idx"]} : "מאפיין של..."\n')
 
     diagram = f'export const diagram = `{diagram}`;'
-    (Path(__file__).parent.parent / 'src' / 'app' / 'diagram.ts').write_text(diagram)
+    outfile.write_text(diagram)
 
 if __name__ == '__main__':
-    main()
+    out_dir = Path(__file__).parent.parent / 'src' / 'app'
+    process(out_dir / 'diagram-vocabulary.ts', True)
+    process(out_dir / 'diagram-simplified.ts', False)

@@ -1,10 +1,11 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import mermaid from 'mermaid';
 import * as L from 'leaflet';
-import { delay, tap, timer } from 'rxjs';
-import { diagram } from './diagram';
+import { delay, filter, fromEvent, tap, timer } from 'rxjs';
+import { diagram as diagramSimplified } from './diagram-simplified';
+import { diagram as diagramVocabulary } from './diagram-vocabulary';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,9 @@ import { diagram } from './diagram';
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
-export class AppComponent {
-  chart = diagram;
+export class AppComponent implements AfterViewInit {
+  chart = [diagramSimplified, diagramVocabulary];
+  currentChart = 1;
   chartSvg: SafeHtml | null = null;
   @ViewChild('chart') chartEl: ElementRef;
   @ViewChild('map') mapEl: ElementRef;
@@ -22,16 +24,26 @@ export class AppComponent {
   map: L.Map;
   svgElementBounds: L.LatLngBoundsLiteral;
 
-  constructor(private domSanitizer: DomSanitizer) {}
+  constructor(private domSanitizer: DomSanitizer, private el: ElementRef) {}
 
   async ngAfterViewInit() {
     mermaid.initialize({
       startOnLoad: false
     });
-    const { svg } = await mermaid.render('chart', this.chart);
+    await this.render();
+    fromEvent<KeyboardEvent>(this.el.nativeElement, 'keydown').pipe(
+      filter((event: KeyboardEvent) => event.key === 'c' || event.key === 'C'),
+    ).subscribe(() => {
+      this.currentChart = (this.currentChart + 1) % this.chart.length;
+      this.render();
+    });
+  }
+
+  async render() {
+    const { svg } = await mermaid.render('chart', this.chart[this.currentChart]);
     this.chartSvg = this.domSanitizer.bypassSecurityTrustHtml(svg);
 
-    this.map = L.map(this.mapEl.nativeElement, {
+    this.map = this.map || L.map(this.mapEl.nativeElement, {
       crs: L.CRS.Simple,
       // maxZoom: configuration.max_zoom,
       // minZoom: configuration.min_zoom,
@@ -43,6 +55,9 @@ export class AppComponent {
     });
     // new L.Control.Zoom({ position: 'bottomleft' }).addTo(this.map);
 
+    if (this.overlay) {
+      this.overlay.remove();
+    }
     timer(1).pipe(
       tap(() => {
         const svgElement = this.chartEl.nativeElement.querySelector('svg');
