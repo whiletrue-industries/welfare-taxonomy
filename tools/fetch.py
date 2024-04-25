@@ -30,7 +30,7 @@ def process(outfile, with_vocabulary=True):
     diagram += ('---\ntitle: טקסונומיה משרד הרווחה\n---\nerDiagram\n')
     for c in concepts:
         diagram += (f'\te{c["idx"]}["{c["Name"]}"]')
-        if c['Vocabulary'] and with_vocabulary:
+        if c['Vocabulary'] and with_vocabulary and len(c['Vocabulary']) < 30:
             diagram += ' {\n'
             for v in c['Vocabulary']:
                 v = v.replace('"', '״').replace('\n', ' ')
