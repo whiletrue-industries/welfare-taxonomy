@@ -27,7 +27,7 @@ jobs:
           pip install -r requirements.txt
       - name: build
         env:
-          AIRTABLE_APIKEY: ${{ secrets.AIRTABLE_APIKEY_RW }}
+          AIRTABLE_APIKEY_RW: ${{ secrets.AIRTABLE_APIKEY_RW }}
           AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
         run: |
           python tools/create-entry-terms.py
