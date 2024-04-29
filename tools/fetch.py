@@ -44,7 +44,7 @@ def process(outfile, with_vocabulary=True):
                 diagram += (f'\te{n["idx"]} ||--|| e{c["idx"]} : "הרחבה של..."\n')
         if c['Facet of...']:
             for f in c['Facet of...']:
-                diagram += (f'\te{f["idx"]} ||--|| e{c["idx"]} : "מאפיין של..."\n')
+                diagram += (f'\te{f["idx"]} ||..|| e{c["idx"]} : "מאפיין של..."\n')
 
     diagram = f'export const diagram = `{diagram}`;'
     outfile.write_text(diagram)
